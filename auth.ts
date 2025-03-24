@@ -6,7 +6,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google],
   callbacks: {
     async signIn({ account, user }) {
-      console.log("account", account?.access_token);
+      if (account) console.log("account", account);
       console.log("user", user);
       return true;
     },
