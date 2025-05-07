@@ -10,7 +10,7 @@ const Header = async () => {
   const session = await auth();
   if (session?.user) {
     return (
-      <div className="h-14 flex items-center justify-between px-5 border">
+      <div className="h-14 flex items-center justify-between px-5 border fixed top-0 w-full">
         <Link href="/">BẢO MẬT WEB</Link>
         <div className="flex items-center h-full relative group">
           {session.user.image && (
@@ -33,7 +33,7 @@ const Header = async () => {
     );
   }
   return (
-    <div className="h-14 flex items-center justify-between border px-5">
+    <div className="h-14 flex items-center justify-between border px-5 fixed top-0 w-full">
       <Link href="/">BẢO MẬT WEB</Link>
       <MenuInHeader />
     </div>

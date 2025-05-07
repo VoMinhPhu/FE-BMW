@@ -6,7 +6,7 @@ import { Resolver, useForm } from "react-hook-form";
 import { useRegister } from "@/utils/auth";
 
 type FormValues = {
-  email: string;
+  // email: string;
   username: string;
   password: string;
 };
@@ -20,12 +20,12 @@ const resolver: Resolver<FormValues> = async (values) => {
       message: "Username is required.",
     };
   }
-  if (!values.email) {
-    errors.username = {
-      type: "required",
-      message: "Email is required.",
-    };
-  }
+  // if (!values.email) {
+  //   errors.username = {
+  //     type: "required",
+  //     message: "Email is required.",
+  //   };
+  // }
 
   if (!values.password) {
     errors.password = {
@@ -78,7 +78,7 @@ const page = () => {
               <p className="text-red-500">{errors.username.message}</p>
             )}
 
-            <p className="font-semibold ">Email</p>
+            {/* <p className="font-semibold ">Email</p>
             <input
               className="w-full border my-2 p-2 rounded"
               {...register("email")}
@@ -86,13 +86,14 @@ const page = () => {
             />
             {errors?.username && (
               <p className="text-red-500">{errors.username.message}</p>
-            )}
+            )} */}
 
             <p className="font-semibold ">Password</p>
             <input
               className="w-full border my-2 p-2 rounded"
               {...register("password")}
               placeholder="Enter your password..."
+              type="password"
             />
             {errors?.password && (
               <p className="text-red-500">{errors.password.message}</p>

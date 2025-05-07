@@ -2,41 +2,58 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const MenuInHeader = () => {
+  const router = useRouter();
   const [openMenu, setOpenMenu] = useState(false);
   const isLogin = localStorage.getItem("isLogin");
 
   const LogoutFn = () => {
     localStorage.removeItem("isLogin");
     localStorage.removeItem("token");
+    router.push("/");
   };
 
   if (isLogin === "true") {
     return (
-      <div
-        onClick={() => setOpenMenu(!openMenu)}
-        className="relative h-full flex items-center"
-      >
-        <Image
-          src="/avt.png"
-          alt="avt"
-          width={40}
-          height={40}
-          className="rounded-full"
-        />
-        <div
-          className={`absolute top-full right-0 border w-44 p-4 bg-white rounded-md shadow-md ${
-            openMenu ? "block" : "hidden"
-          }`}
+      <div className="flex items-center gap-4 h-full">
+        <Link
+          href="/setting"
+          className="hover:bg-gray-100 rounded-full p-2 cursor-pointer"
         >
-          <p className="w-full font-semibold text-center">Username</p>
-          <button
-            onClick={LogoutFn}
-            className="border px-4 py-2 rounded hover:bg-slate-200 w-full mt-2"
+          <Image
+            src="setting.svg"
+            alt="setting"
+            width={28}
+            height={28}
+            className="rounded-full with-[28px] h-[28px] cursor-pointer"
+          />
+        </Link>
+        <div
+          onClick={() => setOpenMenu(!openMenu)}
+          className="relative h-full flex items-center"
+        >
+          <Image
+            src="/avt.png"
+            alt="avt"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <div
+            className={`absolute top-full right-0 border w-44 p-4 bg-white rounded-md shadow-md ${
+              openMenu ? "block" : "hidden"
+            }`}
           >
-            Logout
-          </button>
+            <p className="w-full font-semibold text-center">Username</p>
+            <button
+              onClick={LogoutFn}
+              className="border px-4 py-2 rounded hover:bg-slate-200 w-full mt-2"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     );

@@ -1,6 +1,14 @@
 "use client";
 
-import { getProfileFn, loginFn, registerFn } from "@/app/api/auth/auth";
+import {
+  changePasswordFn,
+  disableUserFn,
+  getAllUserFn,
+  getProfileFn,
+  loginFn,
+  registerFn,
+  updateProfileFn,
+} from "@/app/api/auth/auth";
 import { LoginResponse } from "@/type/auth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -12,7 +20,7 @@ const useLogin = () => {
   return useMutation({
     mutationFn: loginFn,
     onSuccess: async (data) => {
-      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("token", data.token);
       localStorage.setItem("isLogin", "true");
       queryClient.invalidateQueries({ queryKey: ["user"] });
       setTimeout(() => router.push("/"), 500);
@@ -43,4 +51,50 @@ const useGetProfile = () => {
   });
 };
 
-export { useLogin, useRegister, useGetProfile };
+const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: any) => updateProfileFn(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    },
+  });
+};
+
+const useGetAllUser = () => {
+  return useQuery({
+    queryKey: ["allUser"],
+    queryFn: getAllUserFn,
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
+const useDisableUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: any) => disableUserFn(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allUser"] });
+    },
+  });
+};
+
+const useChangePassword = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: any) => changePasswordFn(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    },
+  });
+};
+
+export {
+  useLogin,
+  useRegister,
+  useGetProfile,
+  useUpdateProfile,
+  useGetAllUser,
+  useDisableUser,
+  useChangePassword,
+};
