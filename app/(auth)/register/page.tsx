@@ -4,6 +4,7 @@ import Link from "next/link";
 import SignInBtn from "@/components/SignInBtn";
 import { Resolver, useForm } from "react-hook-form";
 import { useRegister } from "@/utils/auth";
+import { useEffect, useState } from "react";
 
 type FormValues = {
   // email: string;
@@ -14,23 +15,31 @@ type FormValues = {
 const resolver: Resolver<FormValues> = async (values) => {
   const errors: Record<string, any> = {};
 
+  const xssCharsRegex = /[<>\/\\'"()]/; // các ký tự thường dùng trong XSS
+
+  // Username validation
   if (!values.username) {
     errors.username = {
       type: "required",
       message: "Username is required.",
     };
+  } else if (xssCharsRegex.test(values.username)) {
+    errors.username = {
+      type: "xss",
+      message: "Username contains invalid characters.",
+    };
   }
-  // if (!values.email) {
-  //   errors.username = {
-  //     type: "required",
-  //     message: "Email is required.",
-  //   };
-  // }
 
+  // Password validation
   if (!values.password) {
     errors.password = {
       type: "required",
       message: "Password is required.",
+    };
+  } else if (xssCharsRegex.test(values.password)) {
+    errors.password = {
+      type: "xss",
+      message: "Password contains invalid characters.",
     };
   }
 
@@ -39,8 +48,56 @@ const resolver: Resolver<FormValues> = async (values) => {
     errors,
   };
 };
+
+// const resolver: Resolver<FormValues> = async (values) => {
+//   const errors: Record<string, any> = {};
+
+//   if (!values.username) {
+//     errors.username = {
+//       type: "required",
+//       message: "Username is required.",
+//     };
+//   }
+//   // if (!values.email) {
+//   //   errors.username = {
+//   //     type: "required",
+//   //     message: "Email is required.",
+//   //   };
+//   // }
+
+//   if (!values.password) {
+//     errors.password = {
+//       type: "required",
+//       message: "Password is required.",
+//     };
+//   }
+
+//   return {
+//     values: Object.keys(errors).length ? {} : values,
+//     errors,
+//   };
+// };
 const page = () => {
-  const { mutate: registerFn } = useRegister();
+  const [statusRegisterErr, setStatusRegisterErr] = useState(false);
+  const [messRegister, setMessRegister] = useState("");
+  const { mutate: registerFn, data } = useRegister();
+
+  useEffect(() => {
+    if (data?.status === 400) {
+      setStatusRegisterErr(true);
+      setMessRegister(
+        "Password must have at least 8 characters including uppercase, lowercase, number and special characters!"
+      );
+      console.log(data?.data);
+    } else if (data?.status === 500) {
+      setStatusRegisterErr(true);
+      setMessRegister("Username have been already");
+    } else {
+      setStatusRegisterErr(false);
+      setMessRegister("Register success");
+    }
+  }, [data]);
+
   const {
     register,
     handleSubmit,
@@ -105,6 +162,9 @@ const page = () => {
           </form>
           <div className="text-center">
             <SignInBtn />
+            {statusRegisterErr && (
+              <p className="text-red-500 text-center mt-4">{messRegister}</p>
+            )}
           </div>
         </div>
       </div>

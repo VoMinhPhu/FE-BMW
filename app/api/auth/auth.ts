@@ -7,7 +7,7 @@ export const loginFn = async (payload: any) => {
     return data;
   } catch (error: unknown) {
     console.log(error);
-    throw error;
+    return error;
   }
 };
 
@@ -17,6 +17,7 @@ export const registerFn = async (payload: any) => {
     return data;
   } catch (error: unknown) {
     console.log(error);
+    return error;
   }
 };
 

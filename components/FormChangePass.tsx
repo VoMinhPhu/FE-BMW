@@ -11,16 +11,28 @@ type ChangePassForm = {
 const resolver: Resolver<ChangePassForm> = async (values) => {
   const errors: Record<string, any> = {};
 
+  const strongPasswordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
+
+  // Old password
   if (!values.oldPassword) {
     errors.oldPassword = {
       type: "required",
       message: "Old password is required",
     };
   }
+
+  // New password
   if (!values.newPassword) {
     errors.newPassword = {
       type: "required",
       message: "New password is required",
+    };
+  } else if (!strongPasswordRegex.test(values.newPassword)) {
+    errors.newPassword = {
+      type: "pattern",
+      message:
+        "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
     };
   }
 
@@ -30,8 +42,30 @@ const resolver: Resolver<ChangePassForm> = async (values) => {
   };
 };
 
+// const resolver: Resolver<ChangePassForm> = async (values) => {
+//   const errors: Record<string, any> = {};
+
+//   if (!values.oldPassword) {
+//     errors.oldPassword = {
+//       type: "required",
+//       message: "Old password is required",
+//     };
+//   }
+//   if (!values.newPassword) {
+//     errors.newPassword = {
+//       type: "required",
+//       message: "New password is required",
+//     };
+//   }
+
+//   return {
+//     values: Object.keys(errors).length ? {} : values,
+//     errors,
+//   };
+// };
+
 const FormChangePass = () => {
-  const { mutate: changePassFn } = useChangePassword();
+  const { mutate: changePassFn, data } = useChangePassword();
   const {
     register,
     handleSubmit,
@@ -53,6 +87,7 @@ const FormChangePass = () => {
           className="w-full border my-2 p-2 rounded"
           {...register("oldPassword")}
           placeholder="Enter your oldPassword..."
+          type="password"
         />
         {errors?.oldPassword && (
           <p className="text-red-500">{errors.oldPassword.message}</p>
@@ -63,7 +98,11 @@ const FormChangePass = () => {
           className="w-full border my-2 p-2 rounded"
           {...register("newPassword")}
           placeholder="Enter your newPassword..."
+          type="password"
         />
+        {errors?.newPassword && (
+          <p className="text-red-500">{errors.newPassword.message}</p>
+        )}
 
         <button
           type="submit"

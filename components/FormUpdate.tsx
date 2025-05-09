@@ -14,14 +14,60 @@ type UpdateForm = {
 const resolver: Resolver<UpdateForm> = async (values) => {
   const errors: Record<string, any> = {};
 
+  const xssCharsRegex = /[<>\/\\'"()]/;
+
+  // Fullname (optional, nhưng không được chứa ký tự nguy hiểm nếu có)
+  if (values.fullname && xssCharsRegex.test(values.fullname)) {
+    errors.fullname = {
+      type: "xss",
+      message: "Fullname contains invalid characters.",
+    };
+  }
+
+  // Address (optional)
+  if (values.address && xssCharsRegex.test(values.address)) {
+    errors.address = {
+      type: "xss",
+      message: "Address contains invalid characters.",
+    };
+  }
+
+  // Phone (optional, nhưng nếu có thì phải đúng định dạng)
+  const phoneRegex = /^[0-9]{9,11}$/;
+  if (values.phone) {
+    if (!phoneRegex.test(values.phone)) {
+      errors.phone = {
+        type: "pattern",
+        message: "Phone must be 9-11 digits.",
+      };
+    }
+  }
+
+  // Gender (nếu buộc chọn thì vẫn để required, nếu optional thì bỏ check này)
+  if (values.gender && !["male", "female"].includes(values.gender)) {
+    errors.gender = {
+      type: "invalid",
+      message: "Invalid gender selected.",
+    };
+  }
+
   return {
     values: Object.keys(errors).length ? {} : values,
     errors,
   };
 };
 
+// const resolver: Resolver<UpdateForm> = async (values) => {
+//   const errors: Record<string, any> = {};
+
+//   return {
+//     values: Object.keys(errors).length ? {} : values,
+//     errors,
+//   };
+// };
+
 const FormUpdate = () => {
-  const { mutate: updateFn } = useUpdateProfile();
+  const { mutate: updateFn, data: dataUpdate } = useUpdateProfile();
 
   const { data, isLoading } = useGetProfile();
 
