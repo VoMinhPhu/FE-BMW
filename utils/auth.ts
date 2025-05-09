@@ -20,10 +20,12 @@ const useLogin = () => {
   return useMutation({
     mutationFn: loginFn,
     onSuccess: async (data) => {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("isLogin", "true");
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      setTimeout(() => router.push("/"), 500);
+      if (data.status !== 401 && data.status !== 403) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("isLogin", "true");
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+        setTimeout(() => router.push("/"), 500);
+      }
     },
   });
 };
@@ -36,9 +38,10 @@ const useRegister = () => {
     mutationFn: registerFn,
     onSuccess: (data) => {
       //   localStorage.setItem("token", data.access_token);
-      console.log("data", data);
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      setTimeout(() => router.push("/"), 500);
+      if (data.status !== 400 && data.status !== 500) {
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+        setTimeout(() => router.push("/login"), 500);
+      }
     },
   });
 };
